@@ -9,7 +9,12 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "leaflet": "^1.7.1",
+    "leaflet-geosearch": "^3.6.0",
+    "sweetalert": "^2.1.2",
+    "vue": "^2.6.11",
+    "vue2-leaflet": "^2.7.1",
+    "vue2-leaflet-geosearch": "^1.0.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
