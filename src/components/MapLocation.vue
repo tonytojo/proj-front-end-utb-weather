@@ -53,5 +53,7 @@ export default {
     width: 75%;
     min-height: 400px;
     min-width: 400px;
+
+    max-height: 400px;
     }
 </style>

@@ -82,15 +82,22 @@ export default {
     //Get weather data for a given city
     fetchWeather(e) {
       if (e.key === "Enter") {
-        fetch(`${this.url_base}weather?q=${this.query}&units=metric&appid=${this.api_key}`)
+          fetch(`${this.url_base}weather?q=${this.query}&units=metric&appid=${this.api_key}`)
           .then((res) => res.json())
           .then((weather) => {
-            this.showWeather = typeof weather.main !== "undefined";
             this.setResults(weather);
-          });
 
-        //Use helper to get latitud and longitud for a given city
-        this.getGeoLocationFromAdr();
+            if(this.weather.cod === 200)
+            {
+              //Use helper to get latitud and longitud for a given city
+              //this.getGeoLocationFromAdr();
+               this.$refs.showMap.mapLocation(weather.coord.lat, weather.coord.lon);
+            }
+            else{
+                sweetalert({text: "No such city exist", icon: "error",
+             });         
+            }
+          });
       }
     },
 
