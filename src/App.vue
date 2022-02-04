@@ -1,11 +1,11 @@
 <template>
-  <main>
-    <div class="search-box">
+  <main class="container-fluid text-white bg-secondary">
+    <div class="mt-2 mb-3 w-100">
       <input type="text" class="search-bar" placeholder="Search..." v-model="query" @keypress="fetchWeather" />
     </div>
 
-    <div class="container">
-      <div class="weather-wrap" v-if="weather">
+    <div class="row justify-content-center">
+         <div v-if="weather" class="col-sm-12 col-md-5">
         <div class="location-box">
           <div class="location">
             {{ weather.name }}, {{ weather.sys.country }}
@@ -13,7 +13,7 @@
           <div class="date">{{ dateBuilder() }}</div>
         </div>
 
-        <div class="weather-box">
+        <div class="text-center">
           <div class="temp">{{ Math.round(weather.main.temp) }}&deg;C</div>
           <div class="weather" @click="changeIconSet = !changeIconSet">
             {{ weather.weather[0].main }}
@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="col-xs-12 col-md-5">
         <MapLocation ref="showMap" />
       </div>
     </div>
@@ -115,7 +115,6 @@ export default {
 
           this.lat = position.coords.latitude;
           this.long = position.coords.longitude;
-
           this.$refs.showMap.mapLocation(position.coords.latitude, position.coords.longitude);
       } 
       else {
@@ -173,9 +172,6 @@ export default {
 
 body {
   font-family: sans-serif;
-  /* TESTA! */
-  color: white;
-  background-color:#d3d3d3;
 }
 
 #app {
@@ -195,18 +191,10 @@ main {
   );
 }
 
-.search-box {
-  width: 100%;
-  margin-bottom: 30px;
-}
-
-.search-box .search-bar {
-  display: block;
+.w-100 .search-bar {
   width: 100%;
   padding: 15px;
-  color: #313;
   font-size: 20px;
-  appearance: none;
   border: none;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
   outline: none;
@@ -214,12 +202,6 @@ main {
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 0 16px 0 16px;
   transition: 0.4s;
-}
-
-.search-box .search-bar:focus {
-  background-color: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.25);
-  border-radius: 16px 0 16px 0;
 }
 
 .location-box .location {
@@ -238,11 +220,7 @@ main {
   text-align: center;
 }
 
-.weather-box {
-  text-align: center;
-}
-
-.weather-box .temp {
+.text-center .temp {
   display: inline-block;
   padding: 10px 25px;
   color: #fff;
@@ -255,7 +233,7 @@ main {
   box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
 }
 
-.weather-box .weather {
+.weather {
   color: #fff;
   font-size: 48px;
   font-weight: 100;
@@ -263,11 +241,7 @@ main {
   text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
 }
 
-.container {
-  display: flex;
-}
-
-.weather-wrap {
-  width:50%;
+::placeholder { 
+  color: #fff;
 }
 </style>

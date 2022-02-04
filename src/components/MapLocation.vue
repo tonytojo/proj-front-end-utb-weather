@@ -1,11 +1,11 @@
 <template>
-  <div class="map-wrapper">
-    <div style="paddingBottom:10px">
-      <h2>Latitud:&nbsp;&nbsp;&nbsp; <span class="bg-red">{{lat}}</span></h2>
-      <h2>Longitud: <span class="bg-red">{{long}}</span></h2>
+  <div>
+    <div class="pb-2 text-center mt-4 mt-md-0">
+      <h3>Latitud:&nbsp; <span class="pb-2">{{lat}}</span></h3>
+      <h3>Longitud:&nbsp; <span class="pb-2">{{long}}</span></h3>
     </div>
 
-    <LMap class="show-map" :zoom="zoom" :center="center">
+    <LMap class="show-map w-75 rounded mb-3 mx-auto" :zoom="zoom" :center="center">
       <LTileLayer :url="url" :attribution="attribution"></LTileLayer>
       <LMarker :lat-lng="marker"></LMarker> 
     </LMap>
@@ -41,19 +41,10 @@ export default {
 </script>
 
 <style scoped>
-  .bg-red {
-    background-color: red;
-  }
-  .map-wrapper {
-    height: 100%;
-    width: 100%;
-    }
-
   .show-map {
-    width: 75%;
-    min-height: 400px;
-    min-width: 400px;
-
+    min-height: 370px;
+    min-width: 370px;
     max-height: 400px;
     }
+
 </style>
