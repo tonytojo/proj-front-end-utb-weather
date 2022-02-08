@@ -5,7 +5,7 @@
     </div>
 
     <div class="row justify-content-center">
-         <div v-if="weather" class="col-sm-12 col-md-5">
+      <div v-if="weather" class="no-gutters col-sm-12 col-md-5">
         <div class="location-box">
           <div class="location">
             {{ weather.name }}, {{ weather.sys.country }}
@@ -19,10 +19,16 @@
             {{ weather.weather[0].main }}
             <WeatherIcon :iconSetOneID="weather.weather[0].icon" :weatherID="weather.weather[0].id" :showIconSetTwo="changeIconSet" />
           </div>
+
+          <h3>Väderdata</h3>
+          <h4>Lufttryck: {{pressure}} hPa</h4>
+          <h4>Luftfuktighet: {{humidity}} %</h4>
+          <h4>Wind: {{wind}} m/s</h4>
+          <h4>Sikt:{{visibility}} meter</h4>
         </div>
       </div>
 
-      <div class="col-xs-12 col-md-5">
+      <div class="no-gutters col-xs-12 col-md-5">
         <MapLocation ref="showMap" />
       </div>
     </div>
@@ -51,6 +57,10 @@ export default {
       apikey: "eX4LyGYFGO3dZjbHc6BeIzaxDekw7uhk",
       lat: "",
       long: "",
+      pressure:'',
+      humidity:'',
+      wind:'',
+      visibility:''
     };
   },
   //Get Latitud and weather
@@ -68,6 +78,7 @@ export default {
     },
 
     //Get latitud and longitud for a given city
+    /* Not used because we get lat and long from REST-API väder
     async getGeoLocationFromAdr() {
       const response = await fetch(`http://open.mapquestapi.com/nominatim/v1/search.php?key=${this.apikey}&format=json&q=` + this.query);
       const data = await response.json();
@@ -78,25 +89,33 @@ export default {
       //Show map with a location pointer
       this.$refs.showMap.mapLocation(this.lat, this.long);
     },
+    */
 
     //Get weather data for a given city
     fetchWeather(e) {
       if (e.key === "Enter") {
           fetch(`${this.url_base}weather?q=${this.query}&units=metric&appid=${this.api_key}`)
-          .then((res) => res.json())
-          .then((weather) => {
-            this.setResults(weather);
+          .then(res => res.json())
+          .then(weather => 
+          {
+              if(weather.cod === 200)
+              {
+                this.pressure = weather.main.pressure;
+                this.humidity = weather.main.humidity;
+                this.wind = weather.wind.speed;
+                this.visibility = weather.visibility;
 
-            if(this.weather.cod === 200)
-            {
-              //Use helper to get latitud and longitud for a given city
-              //this.getGeoLocationFromAdr();
-               this.$refs.showMap.mapLocation(weather.coord.lat, weather.coord.lon);
-            }
-            else{
-                sweetalert({text: "No such city exist", icon: "error",
-             });         
-            }
+                this.setResults(weather);
+                //Get local date and time
+                let now = new Date(weather.dt*1000+(weather.timezone*1000));
+                now.setHours(now.getHours() - 1);                                
+                now = now.toString().substr(0,24);
+                this.$refs.showMap.mapLocation(weather.coord.lat, weather.coord.lon, now);
+              }
+              else
+              {
+                sweetalert({text: "No such city exist", icon: "error"});         
+              }
           });
       }
     },
@@ -108,14 +127,19 @@ export default {
       let position = await this.getPosition();
 
      //Get weather data for a given latitud and longitud
-      if (position.coords) {
+      if (position.coords) 
+      {
         fetch(`${this.url_base}weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric&appid=${this.api_key}`)
           .then((res) => res.json())
-          .then(this.setResults);
-
-          this.lat = position.coords.latitude;
-          this.long = position.coords.longitude;
-          this.$refs.showMap.mapLocation(position.coords.latitude, position.coords.longitude);
+          .then(weather => {
+              this.pressure = weather.main.pressure;
+              this.humidity = weather.main.humidity;
+              this.wind = weather.wind.speed;
+              this.visibility = weather.visibility;
+              
+              this.setResults(weather);
+              this.$refs.showMap.mapLocation(position.coords.latitude, position.coords.longitude, '');
+          });
       } 
       else {
         sweetalert({
@@ -243,5 +267,10 @@ main {
 
 ::placeholder { 
   color: #fff;
+}
+
+.no-gutters {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 </style>
