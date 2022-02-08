@@ -56,6 +56,8 @@ export default {
          this.month = now.substr(4, 3);
          const year = now.substr(11, 4);
          const hh = now.substr(16,2);
+
+         //We use the same minute and second as the computer
          const mm = new Date().getMinutes();
          const ss = new Date().getSeconds();
        

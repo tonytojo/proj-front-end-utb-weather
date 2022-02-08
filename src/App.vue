@@ -1,7 +1,7 @@
 <template>
   <main class="container-fluid text-white bg-secondary">
     <div class="mt-2 mb-3 w-100">
-      <input type="text" class="search-bar" placeholder="Search..." v-model="query" @keypress="fetchWeather" />
+      <input ref="city" type="text" class="search-bar" placeholder="Search..." v-model="query" @keypress="fetchWeather" />
     </div>
 
     <div class="row justify-content-center">
@@ -20,7 +20,7 @@
             <WeatherIcon :iconSetOneID="weather.weather[0].icon" :weatherID="weather.weather[0].id" :showIconSetTwo="changeIconSet" />
           </div>
 
-          <h3>Väderdata</h3>
+          <h2 class="pb-2">Väderdata</h2>
           <h4>Lufttryck: {{pressure}} hPa</h4>
           <h4>Luftfuktighet: {{humidity}} %</h4>
           <h4>Wind: {{wind}} m/s</h4>
@@ -66,9 +66,13 @@ export default {
   //Get Latitud and weather
   mounted() {
     this.fetchMyLocationAndWeather();
+     this.focusInput();
   },
 
   methods: {
+      focusInput() {
+      this.$refs.city.focus();
+    },
     //Get geolocation with latitud and longitud from
     //current position
     getPosition() {
@@ -98,6 +102,7 @@ export default {
           .then(res => res.json())
           .then(weather => 
           {
+            console.log("weather=",weather);
               if(weather.cod === 200)
               {
                 this.pressure = weather.main.pressure;
@@ -106,6 +111,7 @@ export default {
                 this.visibility = weather.visibility;
 
                 this.setResults(weather);
+
                 //Get local date and time
                 let now = new Date(weather.dt*1000+(weather.timezone*1000));
                 now.setHours(now.getHours() - 1);                                
@@ -142,10 +148,7 @@ export default {
           });
       } 
       else {
-        sweetalert({
-          text: "Geolocation can not be used",
-          icon: "info",
-        });
+        sweetalert({text: "Geolocation can not be used",icon: "info"});
       }
     },
     setResults(results) {
