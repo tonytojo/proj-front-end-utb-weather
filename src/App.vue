@@ -5,9 +5,9 @@
     </div>
 
     <div class="row justify-content-center">
-      <div v-if="weather" class="no-gutters col-sm-12 col-md-5">
+      <div v-if="weather" class="no-gutters col-sm-12 col-md-5 position-static">
         <div class="location-box">
-          <h1 class="location">
+          <h1 class="location h-title">
             {{ weather.name }}, {{ weather.sys.country }}
           </h1>
           <div class="date">{{ dateBuilder() }}</div>
@@ -20,16 +20,18 @@
             <WeatherIcon :iconSetOneID="weather.weather[0].icon" :weatherID="weather.weather[0].id" :showIconSetTwo="changeIconSet" />
           </div>
 
-          <h2 class="pb-2">Väderdata</h2>
+          <h1 class="pb-2 h-title">Väderdata</h1>
           <h5>Lufttryck: {{pressure}} hPa</h5>
           <h5>Luftfuktighet: {{humidity}} %</h5>
-          <h5>Wind: {{wind}} m/s</h5>
+          
+          <h5 class="d-inline-block">Wind: {{wind}} m/s</h5>&nbsp;
+          <img v-if="direction" :src="require(`@/assets/${direction}`)" alt="">    
           <h5>Sikt:{{visibility}} meter</h5>
         </div>
       </div>
 
-      <div class="no-gutters col-xs-12 col-md-7">
-        <MapLocation ref="showMap" />
+      <div class="no-gutters col-xs-12 col-md-7 position-static">
+       <MapLocation ref="showMap" />
       </div>
     </div>
   </main>
@@ -43,11 +45,12 @@ import MapLocation from './components/MapLocation.vue';
 export default {
   name: "App",
   components: {
-    WeatherIcon, MapLocation
+    WeatherIcon,MapLocation
   },
 
   data() {
     return {
+      validDirections:['n.png', 'nne.png', 'ne.png', 'ene.png', 'e.png', 'ese.png', 'se.png', 'sse.png', 's.png', 'ssw.png', 'sw.png', 'wsw.png', 'w.png', 'wnw.png', 'nw.png', 'nnw.png','n.png'],
       api_key: "31bb142cae6eb97ee59e5b60d90e1e94",
       url_base: "https://api.openweathermap.org/data/2.5/",
       query: "",
@@ -60,6 +63,7 @@ export default {
       pressure:'',
       humidity:'',
       wind:'',
+      direction:'',
       visibility:''
     };
   },
@@ -108,7 +112,7 @@ export default {
                 this.humidity = weather.main.humidity;
                 this.wind = weather.wind.speed;
                 this.visibility = weather.visibility;
-
+                this.direction = this.validDirections[Math.round(weather.wind.deg/22.5)];
                 this.setResults(weather);
 
                 //Get local date and time
@@ -137,10 +141,10 @@ export default {
         fetch(`${this.url_base}weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric&appid=${this.api_key}`)
           .then((res) => res.json())
           .then(weather => {
-            console.log("Weather=",weather);
               this.pressure = weather.main.pressure;
               this.humidity = weather.main.humidity;
               this.wind = weather.wind.speed;
+              this.direction = this.validDirections[Math.round(weather.wind.deg/22.5)];
               this.visibility = weather.visibility;
               
               this.setResults(weather);
@@ -192,6 +196,7 @@ export default {
 </script>
 
 <style>
+  @import './assets/windDirection.css';
   @import './assets/fullScreen.css';
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
 
@@ -237,10 +242,13 @@ export default {
 
   .location-box .location {
     color: #fff;
-    font-size: 28px;
-    font-weight: 500;
     text-align: center;
     text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
+  }
+
+  .h-title {
+    font-size: 30px;
+    font-weight: bold;
   }
 
   .location-box .date {
