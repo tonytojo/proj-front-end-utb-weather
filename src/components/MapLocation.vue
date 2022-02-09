@@ -1,24 +1,23 @@
 <template>
   <div>
     <div class="pb-2 text-center mt-4 mt-md-0">
-      <h4>Latitud:&nbsp; <span class="pb-2">{{ lat }}</span></h4>
-      <h4>Longitud:&nbsp; <span class="pb-2">{{ long }}</span></h4>
-      <h4 v-if="localTime">Lokal tid: {{date}}  {{ localTime }}</h4>
+      <h5>Latitud:&nbsp; <span class="pb-2">{{ lat }}</span></h5>
+      <h5>Longitud:&nbsp; <span class="pb-2">{{ long }}</span></h5>
+      <h5 v-if="localTime">Lokal tid: {{date}}  {{ localTime }}</h5>
     </div>
 
-    <LMap
-      class="show-map w-75 rounded mb-3 mx-auto"
-      :zoom="zoom"
-      :center="center">
-      <LTileLayer :url="url" :attribution="attribution"></LTileLayer>
-      <LMarker :lat-lng="marker"></LMarker>
+    <LMap class="show-map w-75 rounded mb-3 mx-auto" :zoom="zoom" :center="center">
+      <LTileLayer :url="url" :attribution="attribution" />
+      <LControlFullscreen position="topleft" :options="fullscreenOptions" />
+      <LMarker :lat-lng="marker" />
     </LMap>
   </div>
 </template>
 
 <script>
 import L from "leaflet";
-import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
+import {LMap, LTileLayer, LMarker} from "vue2-leaflet";
+import LControlFullscreen from './LControlFullscreen';
 
 export default {
   name: "MapLocation",
@@ -36,16 +35,21 @@ export default {
       zoom: 14,
       center: L.latLng(0, 0),
       marker: L.latLng(0, 0),
+       fullscreenOptions: {
+        title: {
+          'false': 'Switch to full-screen view',
+          'true': 'Exit full-screen mode',
+        },
+      },
       url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
   },
-  components: { LMap, LTileLayer, LMarker },
-
-  methods: {
+  components: {LMap,LTileLayer,LMarker,LControlFullscreen},
  
-    mapLocation(lat, long, now) 
+  methods: {
+    mapLocation(lat,long,now) 
     {
       if (now) {
         this.interval ? clearInterval(this.interval): '';
@@ -70,7 +74,7 @@ export default {
             time.localTime = localTime.toLocaleTimeString();
          }, 1000);
       }
-
+       
       this.center = L.latLng(lat, long);
       this.marker = L.latLng(lat, long);
       this.lat = lat;
@@ -81,9 +85,18 @@ export default {
 </script>
 
 <style scoped>
-.show-map {
-  min-height: 370px;
-  min-width: 370px;
-  max-height: 400px;
-}
+  .show-map {
+    min-height: 440px;
+    min-width: 430px;
+    max-height: 440px;
+  }
+
+   @media screen and (max-width: 767px) {
+    .show-map {
+    min-height: 440px;
+    min-width: 380px;
+    max-height: 440px;
+  } 
+   }
+  
 </style>

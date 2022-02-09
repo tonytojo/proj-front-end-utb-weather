@@ -7,9 +7,9 @@
     <div class="row justify-content-center">
       <div v-if="weather" class="no-gutters col-sm-12 col-md-5">
         <div class="location-box">
-          <div class="location">
+          <h1 class="location">
             {{ weather.name }}, {{ weather.sys.country }}
-          </div>
+          </h1>
           <div class="date">{{ dateBuilder() }}</div>
         </div>
 
@@ -21,14 +21,14 @@
           </div>
 
           <h2 class="pb-2">Väderdata</h2>
-          <h4>Lufttryck: {{pressure}} hPa</h4>
-          <h4>Luftfuktighet: {{humidity}} %</h4>
-          <h4>Wind: {{wind}} m/s</h4>
-          <h4>Sikt:{{visibility}} meter</h4>
+          <h5>Lufttryck: {{pressure}} hPa</h5>
+          <h5>Luftfuktighet: {{humidity}} %</h5>
+          <h5>Wind: {{wind}} m/s</h5>
+          <h5>Sikt:{{visibility}} meter</h5>
         </div>
       </div>
 
-      <div class="no-gutters col-xs-12 col-md-5">
+      <div class="no-gutters col-xs-12 col-md-7">
         <MapLocation ref="showMap" />
       </div>
     </div>
@@ -66,12 +66,12 @@ export default {
   //Get Latitud and weather
   mounted() {
     this.fetchMyLocationAndWeather();
-     this.focusInput();
+    this.focusInput();
   },
 
   methods: {
       focusInput() {
-      this.$refs.city.focus();
+        this.$refs.city.focus();
     },
     //Get geolocation with latitud and longitud from
     //current position
@@ -102,7 +102,6 @@ export default {
           .then(res => res.json())
           .then(weather => 
           {
-            console.log("weather=",weather);
               if(weather.cod === 200)
               {
                 this.pressure = weather.main.pressure;
@@ -138,13 +137,15 @@ export default {
         fetch(`${this.url_base}weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric&appid=${this.api_key}`)
           .then((res) => res.json())
           .then(weather => {
+            console.log("Weather=",weather);
               this.pressure = weather.main.pressure;
               this.humidity = weather.main.humidity;
               this.wind = weather.wind.speed;
               this.visibility = weather.visibility;
               
               this.setResults(weather);
-              this.$refs.showMap.mapLocation(position.coords.latitude, position.coords.longitude, '');
+              const now = new Date().toString().substr(0,24);
+              this.$refs.showMap.mapLocation(position.coords.latitude, position.coords.longitude, now);
           });
       } 
       else {
@@ -191,89 +192,92 @@ export default {
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+  @import './assets/fullScreen.css';
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
 
-body {
-  font-family: sans-serif;
-}
+  h1,h2,h3,h4,h5,h6 {
+     font-family: 'Open Sans', sans-serif;
+  }
 
-#app {
-  background-image: url("https://images.unsplash.com/photo-1516912481808-3406841bd33c?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=3288&q=80");
-  background-size: cover;
-  background-position: center;
-  transition: 0.4s;
-}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-main {
-  min-height: 100vh;
-  padding: 25px;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.25),
-    rgba(0, 0, 0, 0.75)
-  );
-}
+  body {
+    font-family: sans-serif;
+  }
 
-.w-100 .search-bar {
-  width: 100%;
-  padding: 15px;
-  font-size: 20px;
-  border: none;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
-  outline: none;
-  background: none;
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 0 16px 0 16px;
-  transition: 0.4s;
-}
+  #app {
+    background-image: url("https://images.unsplash.com/photo-1516912481808-3406841bd33c?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=3288&q=80");
+    background-size: cover;
+    background-position: center;
+    transition: 0.4s;
+  }
 
-.location-box .location {
-  color: #fff;
-  font-size: 32px;
-  font-weight: 500;
-  text-align: center;
-  text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
-}
+  main {
+    min-height: 100vh;
+    padding: 25px;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.25),rgba(0, 0, 0, 0.75));
+  }
 
-.location-box .date {
-  color: #fff;
-  font-size: 20px;
-  font-weight: 300;
-  font-style: italic;
-  text-align: center;
-}
+  .w-100 .search-bar {
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    border: none;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+    outline: none;
+    background: none;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 0 16px 0 16px;
+    transition: 0.4s;
+  }
 
-.text-center .temp {
-  display: inline-block;
-  padding: 10px 25px;
-  color: #fff;
-  font-size: 102px;
-  font-weight: 900;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-  background-color: rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
-  margin: 30px 0;
-  box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
+  .location-box .location {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 500;
+    text-align: center;
+    text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
+  }
 
-.weather {
-  color: #fff;
-  font-size: 48px;
-  font-weight: 100;
-  font-style: italic;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
+  .location-box .date {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    text-align: center;
+  }
 
-::placeholder { 
-  color: #fff;
-}
+  .text-center .temp {
+    display: inline-block;
+    padding: 10px 25px;
+    color: #fff;
+    font-size: 102px;
+    font-weight: 900;
+    text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 16px;
+    margin: 30px 0;
+   box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+  }
 
-.no-gutters {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
+  .weather {
+    color: #fff;
+    font-size: 48px;
+    font-weight: 100;
+    font-style: italic;
+    text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  ::placeholder { 
+    color: #fff;
+  }
+
+  .no-gutters {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 </style>
