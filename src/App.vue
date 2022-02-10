@@ -1,5 +1,7 @@
 <template>
   <main class="container-fluid text-white bg-secondary">
+    <CityButtons />
+
     <div class="mt-2 mb-3 w-100">
       <input ref="city" type="text" class="search-bar" placeholder="Search..." v-model="query" @keypress="fetchWeather" />
     </div>
@@ -24,28 +26,34 @@
           <h5>Lufttryck: {{pressure}} hPa</h5>
           <h5>Luftfuktighet: {{humidity}} %</h5>
           
-          <h5 class="d-inline-block">Wind: {{wind}} m/s</h5>&nbsp;
+          <h5 class="d-inline-block">Vind: {{wind}} m/s</h5>&nbsp;
           <img v-if="direction" :src="require(`@/assets/${direction}`)" alt="">    
-          <h5>Sikt:{{visibility}} meter</h5>
+          <h5>Sikt: {{visibility}} meter</h5>
         </div>
       </div>
 
       <div class="no-gutters col-xs-12 col-md-7 position-static">
        <MapLocation ref="showMap" />
       </div>
+
+      <!-- // TODO * MY FIX FOR STATES * -->
+      <!--  Waking & Shaking App.vue! ;) -->
+      <div style="font-size: 0px;" >{{ stateWakeApp }}</div>
     </div>
   </main>
 </template>
 
 <script>
 import WeatherIcon from './components/WeatherIcon.vue';
-import sweetalert from 'sweetalert';
 import MapLocation from './components/MapLocation.vue';
+import CityButtons from './components/CityButtons.vue';
+import sweetalert from 'sweetalert';
+import store from './store'
 
 export default {
   name: "App",
   components: {
-    WeatherIcon,MapLocation
+    WeatherIcon, MapLocation, CityButtons
   },
 
   data() {
@@ -73,7 +81,50 @@ export default {
     this.focusInput();
   },
 
+  // ----------------------------------------------------------------
+  // TODO * MY FIX FOR STATES *
+  computed: {
+    stateWakeApp() {      // Waking & Shaking App.vue! ;)
+      this.getLocationFromState();
+      return store.getters.getWakeApp
+    }
+  },
+
   methods: {
+    setStateCoordinates(lat, long, now) {
+      store.commit('setLatitude', lat)
+      store.commit('setLongitude', long)
+      store.commit('setTime', now)
+    },
+
+    getLocationFromState() {
+      let posLat = store.getters.getLatitude
+      let posLon = store.getters.getLongitude
+      fetch(`${this.url_base}weather?lat=${posLat}&lon=${posLon}&units=metric&appid=${this.api_key}`)
+        .then((res) => res.json())
+        .then(weather => {
+          if(weather.cod === 200)
+          {
+            this.pressure = weather.main.pressure;
+            this.humidity = weather.main.humidity;
+            this.wind = weather.wind.speed;
+            this.visibility = weather.visibility;
+            this.direction = this.validDirections[Math.round(weather.wind.deg/22.5)];
+            this.setResults(weather);
+
+            //Get local date and time
+            let now = new Date(weather.dt*1000+(weather.timezone*1000));
+            now.setHours(now.getHours() - 1);                                
+            now = now.toString().substr(0,24);
+            
+            this.setStateCoordinates(weather.coord.lat, weather.coord.lon, now) 
+          }
+        })
+    },
+  // ----------------------------------------------------------------
+
+
+  // methods: {
       focusInput() {
         this.$refs.city.focus();
     },
@@ -119,7 +170,9 @@ export default {
                 let now = new Date(weather.dt*1000+(weather.timezone*1000));
                 now.setHours(now.getHours() - 1);                                
                 now = now.toString().substr(0,24);
-                this.$refs.showMap.mapLocation(weather.coord.lat, weather.coord.lon, now);
+                
+                // TODO * MY FIX FOR STATES *
+                this.setStateCoordinates(weather.coord.lat, weather.coord.lon, now) 
               }
               else
               {
@@ -149,7 +202,9 @@ export default {
               
               this.setResults(weather);
               const now = new Date().toString().substr(0,24);
-              this.$refs.showMap.mapLocation(position.coords.latitude, position.coords.longitude, now);
+
+              // TODO * MY FIX FOR STATES *
+              this.setStateCoordinates(position.coords.latitude, position.coords.longitude, now) 
           });
       } 
       else {
@@ -163,27 +218,15 @@ export default {
     dateBuilder() {
       let d = new Date();
       let months = [
-        "January",
-        "Febuary",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
+        // "January", "Febuary", "March", "April", "May", "June",
+        // "July", "August", "September", "October", "November", "December"
+        "Januari", "Februari", "Mars", "April", "Maj", "Juni",
+        "Juli", "Augusti", "September", "Oktober", "November", "December"
+
       ];
       let days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
+        // "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+        "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"
       ];
       let day = days[d.getDay()];
       let date = d.getDate();
